@@ -6,13 +6,27 @@
 
 const int NUM_STARS = 100;
 const double PI = 3.14;
-
+const int NUM_TRAINS = 2;
 
 typedef struct {
 	double x;
 	double y;
 	int size;
 } STAR;
+
+typedef struct {
+	double bottomLeftX;
+	double bottomLeftY;
+	double bottomRightX;
+	double bottomRightY;
+	double topRightX;
+	double topRightY;
+	double topLeftX;
+	double topLeftY;
+	double colors[3];
+} Train;
+
+Train trains[NUM_TRAINS];
 
 STAR stars[NUM_STARS];
 
@@ -25,13 +39,40 @@ void init()
 	glOrtho(-2, 1, -1, 1, -1, 1); // set the coordinates system
 
 	srand(time(0)); // seed of random numbers
-
+	//give properties to stars
 	for (i = 0;i < NUM_STARS;i++)
 	{
 		stars[i].x = (((rand() % 2000) - 1000) / 1000.0 + 1.0) * 1.5 - 2.0; // random number in range [-2,1)
 		stars[i].y = 0.5 + (rand() % 500) / 1000.0; // random number in range [0.5, 1)
 		stars[i].size = 1 + rand() % 2;
 	}
+
+	//give properties to trains
+	//first train
+	trains[0].bottomLeftX = -2.3;
+	trains[0].bottomLeftY = 0.01;
+	trains[0].topLeftX = -2.3;
+	trains[0].topLeftY = 0.04;
+	trains[0].bottomRightX = -2.05;
+	trains[0].bottomRightY = 0.01;
+	trains[0].topRightX = -2.05;
+	trains[0].topRightY = 0.04;
+	trains[0].colors[0] = 173.0 / 255.0;
+	trains[0].colors[1] = 255.0 / 255.0;
+	trains[0].colors[2] = 47.0 / 255.0;
+
+	//second train
+	trains[1].bottomLeftX = -0.95;
+	trains[1].bottomLeftY = 0.01;
+	trains[1].topLeftX = -0.95;
+	trains[1].topLeftY = 0.04;
+	trains[1].bottomRightX = -0.7;
+	trains[1].bottomRightY = 0.01;
+	trains[1].topRightX = -0.7;
+	trains[1].topRightY = 0.04;
+	trains[1].colors[0] = 0.0;
+	trains[1].colors[1] = 250.0 / 255.0;
+	trains[1].colors[2] = 154.0 / 255.0;
 }
 
 
@@ -176,32 +217,64 @@ void DrawGraph()
 	}
 }
 
-void DrawParabolaAndLines(double xMin, double xMax, double xMid) {
+void DrawParabolaAndLines(double xMin, double xMax, double xMid, bool isReflection) {
 	for (double i = xMin; i <= xMax; i += 0.15) {
 		glBegin(GL_LINES);
-		glColor3d(1.0, 0.0, 0.0);
-		glVertex2d(i, 2 * pow((xMid * -1) + i, 2)+0.05);
+		if (isReflection) {
+			glColor3d(0.5, 0.0, 0.0);
+			glVertex2d(i, 0.75 * -2 * pow((xMid * -1) + i, 2) - 0.05);
+		}
+		else {
+			glColor3d(1.0, 0.0, 0.0);
+			glVertex2d(i, 2 * pow((xMid * -1) + i, 2) + 0.05);
+		}
 		glVertex2d(i, 0);
 		glEnd();
 	}
 
 	for (double i = xMin; i <= xMax; i += 0.001) {
 		glBegin(GL_POINTS);
-		glColor3d(1.0, 0.0, 0.0);
-		glVertex2d(i, 2 * pow((xMid * -1) + i, 2) + 0.05);
+		if (isReflection) {
+			glColor3d(0.5, 0.0, 0.0);
+			glVertex2d(i,0.75 * -2 * pow((xMid * -1) + i, 2) - 0.05);
+		}
+		else {
+			glColor3d(1.0, 0.0, 0.0);
+			glVertex2d(i, 2 * pow((xMid * -1) + i, 2) + 0.05);
+		}
 		glEnd();
 	}
 }
 
 void DrawBridge() {
-	DrawParabolaAndLines(-1.8,-1.2, -1.5);//mid
-	DrawParabolaAndLines(-1.2, -1, -0.9);//right
-	DrawParabolaAndLines(-2.1, -1.8, -2.1);//right
+	//bridge
+	DrawParabolaAndLines(-1.8,-1.2, -1.5, false);//mid
+	DrawParabolaAndLines(-1.2, -1, -0.9, false);//right
+	DrawParabolaAndLines(-2.1, -1.8, -2.1, false);//right
+
+	//reflection
+	DrawParabolaAndLines(-1.8, -1.2, -1.5, true);//mid
+	DrawParabolaAndLines(-1.2, -1, -0.9, true);//right
+	DrawParabolaAndLines(-2.1, -1.8, -2.1, true);//right
+
 	glBegin(GL_LINES);
 	glColor3d(1.0, 0.0, 0.0);
 	glVertex2d(-2,0);
 	glVertex2d(-1, 0);
 	glEnd();
+}
+
+void DrawTrain() {
+	for (int i = 0; i < NUM_TRAINS; i++)
+	{
+		glColor3d(trains[i].colors[0], trains[i].colors[1], trains[i].colors[2]);
+		glBegin(GL_POLYGON);
+		glVertex2d(trains[i].bottomLeftX, trains[i].bottomLeftY);
+		glVertex2d(trains[i].topLeftX, trains[i].topLeftY);
+		glVertex2d(trains[i].topRightX, trains[i].topRightY);
+		glVertex2d(trains[i].bottomRightX, trains[i].bottomRightY);
+		glEnd();
+	}
 }
 
 // put all the drawings here
@@ -211,6 +284,8 @@ void display()
 
 	DrawBackground();
 	
+	DrawTrain();
+
 	DrawGraph();
 
 	DrawBridge();
@@ -220,6 +295,29 @@ void display()
 
 void idle() 
 {
+	//trains animations
+	if (trains[0].bottomLeftX < -0.7 && trains[1].bottomRightX > -2.3) {
+		trains[0].bottomLeftX += 0.0003;
+		trains[0].topLeftX += 0.0003;
+		trains[0].bottomRightX += 0.0003;
+		trains[0].topRightX += 0.0003;
+		trains[1].bottomLeftX -= 0.0003;
+		trains[1].topLeftX -= 0.0003;
+		trains[1].bottomRightX -= 0.0003;
+		trains[1].topRightX -= 0.0003;
+	}
+	else {
+		trains[0].bottomLeftX = -2.3;
+		trains[0].topLeftX = -2.3;
+		trains[0].bottomRightX = -2.05;
+		trains[0].topRightX = -2.05;
+		trains[1].bottomLeftX = -0.95;
+		trains[1].topLeftX = -0.95;
+		trains[1].bottomRightX = -0.7;
+		trains[1].topRightX = -0.7;
+	}
+
+	//stars animation
 	if (rand() % 5 == 0)
 	{
 		int i = rand() % NUM_STARS;
