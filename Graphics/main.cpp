@@ -219,17 +219,32 @@ void DrawGraph()
 
 void DrawParabolaAndLines(double xMin, double xMax, double xMid, bool isReflection) {
 	for (double i = xMin; i <= xMax; i += 0.15) {
-		glBegin(GL_LINES);
 		if (isReflection) {
+			glBegin(GL_LINES);
 			glColor3d(0.5, 0.0, 0.0);
 			glVertex2d(i, 0.75 * -2 * pow((xMid * -1) + i, 2) - 0.05);
+			glVertex2d(i, 0);
+			glEnd();
+			glPointSize(3);
+			glBegin(GL_POINTS);
+			glColor3d(0.7, 0.7, 0.0);
+			glVertex2d(i, 0.75 * -2 * pow((xMid * -1) + i, 2) - 0.07);
+			glEnd();
+			glPointSize(2);
 		}
 		else {
+			glBegin(GL_LINES);
 			glColor3d(1.0, 0.0, 0.0);
 			glVertex2d(i, 2 * pow((xMid * -1) + i, 2) + 0.05);
+			glVertex2d(i, 0);
+			glEnd();
+			glPointSize(3);
+			glBegin(GL_POINTS);
+			glColor3d(1.0, 1.0, 0.0);
+			glVertex2d(i, 2 * pow((xMid * -1) + i, 2) + 0.07);
+			glEnd();
+			glPointSize(2);
 		}
-		glVertex2d(i, 0);
-		glEnd();
 	}
 
 	for (double i = xMin; i <= xMax; i += 0.001) {
