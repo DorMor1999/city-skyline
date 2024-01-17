@@ -206,14 +206,14 @@ void DrawGraph()
 	{
 		y =0.1+ 0.6 * cos(0.4 * PI * x) + 0.2 * sin(4 * PI * x);
 		DrawBuilding(x,0.14,y,y,false, false);//building
-		DrawBuilding(x, 0.14, -1 * y, -1 * y, false, true);//reflection
+		DrawBuilding(x, 0.14, -0.75 * y, -0.75 * y, false, true);//reflection
 	}
 	// near line
 	for (x = -1; x <= 1;x += 0.21)
 	{
 		y = 0.1+ 0.3 * cos(0.4 * PI * x) + 0.1 * sin(3 * PI * x);
 		DrawBuilding(x, 0.18, y, y, true, false);//building
-		DrawBuilding(x, 0.18, -1 * y, -1 * y, true, true);//reflection
+		DrawBuilding(x, 0.18, -0.75 * y, -0.75 * y, true, true);//reflection
 	}
 }
 
